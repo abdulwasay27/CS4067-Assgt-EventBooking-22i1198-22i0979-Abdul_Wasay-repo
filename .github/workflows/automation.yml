@@ -16,7 +16,7 @@ jobs:
                curl -X POST \
                -H 'Content-type: application/json' \
                -H 'X-Automation-Webhook-Token: d026a10efac65baca5831be534ef7d25a11bccce' \
-               --data '{ "issue":  github.event.issue.title , "description":  github.event.issue.body }' \
+               --data '{ "issue":  github.event.issue.title }' \
                https://api-private.atlassian.com/automation/webhooks/jira/a/12ae687c-dbe5-40e1-8497-555ff304f115/0194ec48-b093-7a2f-baa5-448c537ad90e
 
 
