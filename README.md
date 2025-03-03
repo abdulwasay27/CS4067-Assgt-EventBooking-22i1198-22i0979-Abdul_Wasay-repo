@@ -235,3 +235,10 @@ Each service interacts via REST APIs, and PostgreSQL is used for data storage.
    ```
 
 5. Test APIs using Postman or Curl.
+
+---
+
+# Project Screenshots
+
+![Screenshot 1](assets/ss1.jpg)
+![Screenshot 2](assets/ss2.jpg)
