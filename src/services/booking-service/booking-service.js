@@ -59,7 +59,7 @@ async function publishBooking(booking_id, email, status){
           }, 500); 
         } catch (error) {
           console.error('Error confirming booking:', error);
-          throw new Error("Error publishing event to rabbitmq: "+ error.message)
+          throw new Error("Error! While publishing event to rabbitmq: "+ error.message)
         }
 }
 app.post("/booking", async (req, res)=>{
