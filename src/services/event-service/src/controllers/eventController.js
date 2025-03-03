@@ -1,5 +1,5 @@
 const Event = require("../models/eventModel");
-
+const {publishEventNotification }= require("../config/rabbitmq")
 // Fetch all events
 exports.getAllEvents = async (req, res) => {
     try {
@@ -33,6 +33,7 @@ exports.createEvent = async (req, res) => {
 
         res.json({ message: "Event Created", event: newEvent });
     } catch (error) {
+        console.log("Error creating event: " + error )
         res.status(500).json({ error: "Error creating event" });
     }
 };
