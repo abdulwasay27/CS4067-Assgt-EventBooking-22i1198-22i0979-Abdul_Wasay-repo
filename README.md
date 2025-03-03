@@ -248,5 +248,3 @@ Each service interacts via REST APIs, and PostgreSQL is used for data storage.
 
 ---
 
-# Github Link
-
