@@ -69,6 +69,7 @@ app.post("/booking", async (req, res)=>{
             res.status(400).json({message:"All fields required!"})
         }
         const duplicateBooking = await checkUserBooking({email: email, event_id: event_id})
+
         if (duplicateBooking){
             res.status(400).json({message:"Duplicate booking is not allowed!"})
         }
