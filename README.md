@@ -214,7 +214,7 @@ Each service interacts via REST APIs, and PostgreSQL is used for data storage.
 ### Installation Steps
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo.git
+   git clone https://github.com/abdulwasay27/CS4067-Assgt-EventBooking-22i1198-22i0979-Abdul_Wasay-repo.git
    cd services
    ```
 
@@ -222,6 +222,8 @@ Each service interacts via REST APIs, and PostgreSQL is used for data storage.
    ```sh
    cd user-service && npm install
    cd ../event-service && npm install
+   cd ../booking-service && npm install
+   cd ../notification-service && npm install
    ```
 
 3. Setup PostgreSQL:
@@ -242,3 +244,7 @@ Each service interacts via REST APIs, and PostgreSQL is used for data storage.
 
 ![Screenshot 1](assets/ss1.jpg)
 ![Screenshot 2](assets/ss2.jpg)
+
+
+---
+
