@@ -10,6 +10,9 @@ The system follows a microservices architecture, where each service is responsib
 
 Each service interacts via REST APIs, and PostgreSQL is used for data storage.
 
+## Architecture Diagram
+![Architecture Diagram](https://github.com/user-attachments/assets/23ca1848-9209-4402-b844-b2a3a82cc4aa)
+
 ---
 
 ## API Documentation
