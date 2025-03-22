@@ -17,5 +17,5 @@ sequelize.sync()
 
 app.use("/events", require("./routes/eventRoutes"));
 
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => console.log(`Event Service running on port ${PORT}`));
