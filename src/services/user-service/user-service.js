@@ -76,8 +76,7 @@ app.post("/login", async (req, res) => {
         
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password required." });
-        }
-        
+        } 
         const user = await getUserByEmail(email);
         if (!user) {
             return res.status(401).json({ message: "Invalid credentials." });

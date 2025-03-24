@@ -4,7 +4,7 @@ const {publishEventNotification }= require("../config/rabbitmq")
 exports.getAllEvents = async (req, res) => {
     try {
         const events = await Event.findAll();  
-        console.log("Events from DB:", events); // Debugging log
+        // console.log("Events from DB:", events); // Debugging log
         res.json(events);
     } catch (error) {
         console.error("Error fetching events:", error);
@@ -27,8 +27,14 @@ exports.getEventById = async (req, res) => {
 
 // Create a new event
 exports.createEvent = async (req, res) => {
-    const { event_id, name, location } = req.body;
+    const { name, location } = req.body;
     try {
+        const lastEvent =  await Event.findOne({
+            order: [['event_id', 'DESC']]
+        });
+        
+        const event_id = lastEvent ? lastEvent.event_id + 1 : 1; 
+
         const newEvent = await Event.create({ event_id, name, location });
         await publishEventNotification({ event_id, name, location });
 

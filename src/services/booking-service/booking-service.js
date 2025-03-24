@@ -122,8 +122,9 @@ app.post("/book", async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
-app.get("/book/allUserBookings", async (req, res) => {
+app.post("/book/allUserBookings", async (req, res) => {
     const { email } = req.body;
+    
     try {
         const bookings = await getUserBookings(email);
         return res.status(200).json({ message: "All user bookings", bookings });

@@ -1,0 +1,471 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background: #f4f4f4; /* Light grey background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #09122b; /* Dark blue */
+}
+
+
+
+.input-group {
+    display: flex;
+    align-items: center;
+    background: #e8eaf6; /* Light blueish-grey */
+    margin: 15px 0; /* Increased spacing */
+    padding: 14px; /* More padding for better spacing */
+    border-radius: 6px;
+}
+
+.input-group input {
+    border: none;
+    background: none;
+    outline: none;
+    width: 100%;
+    padding: 10px; /* Increased padding inside input */
+    font-size: 16px;
+}
+
+button {
+    margin-top: 20px; /* More space between inputs and button */
+    padding: 14px;
+}
+
+p {
+    margin-top: 15px; /* Increased space before "Already have an account?" */
+}
+
+
+
+.input-group label {
+    margin-right: 10px;
+    color: #1e3a8a; /* Dark blue */
+    font-size: 16px;
+}
+
+.toggle-password {
+    cursor: pointer;
+    color: #1e3a8a;
+    font-size: 14px;
+}
+
+
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.options a {
+    color: #1e3a8a;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.options a:hover {
+    text-decoration: underline;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #1e3a8a; /* Dark blue */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.login-btn:hover {
+    background: #162a63; /* Darker shade of blue */
+}
+
+.social-login {
+    margin-top: 15px;
+}
+
+.social-login p {
+    color: #333;
+}
+
+.icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    font-size: 20px;
+}
+
+.icons i {
+    cursor: pointer;
+    color: #1e3a8a; /* Dark blue */
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.icons i:hover {
+    transform: scale(1.2);
+    color: #162a63; /* Darker shade */
+}
+
+.events-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 15px;
+    width:500px;
+    max-height: 600px; /* Expanded height */
+    overflow-y: auto;
+}
+
+/* Event Card */
+.event-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.event-card:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* Event Title */
+.event-card h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #222;
+}
+
+/* Event Location */
+.event-card p {
+    font-size: 15px;
+    color: #666;
+}
+
+/* Book Now Button */
+.create-event-back {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6200ea;
+    border: 1px solid #6200ea;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.create-event-back:hover {
+    
+}
+.book-btn {
+    margin-top: 12px;
+    padding: 12px;
+    background: #6200ea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.book-btn:hover {
+    background: #390088;
+}
+
+/* Back to Dashboard Button (Now Colored) */
+.back-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6200ea;
+    border: 1px solid #6200ea;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-align: center;
+    
+    
+    /* padding: 12px;
+    background: #5d4b6d; 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    margin-top: 20px; */
+}
+
+
+
+
+.back-btn:hover {
+    background: #6200ea;
+    color: white;
+}
+
+/* Custom Scrollbar */
+.events-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.events-container::-webkit-scrollbar-thumb {
+    background: #aaa;
+    border-radius: 4px;
+}
+
+.events-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.main-wrapper {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+}
+
+/* Title */
+h2 {
+    color: #222;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Links container */
+.link-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Navigation buttons */
+.nav-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #6200ea;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    background-color: #112250;
+}
+
+/* Logout button styling */
+.exit-btn {
+    background-color: #741916;
+}
+
+.exit-btn:hover {
+    background-color: #b52b27;
+}
+/* Booking Container */
+.bookings-container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 500px;
+}
+
+/* Title */
+.bookings-container h2 {
+    color: #111;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Bookings List */
+#bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Booking Card */
+.booking-card {
+    background: linear-gradient(135deg, #ffffff, #f0f0f5); /* Subtle light grey gradient */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.booking-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Event Title */
+.booking-card h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 8px;
+}
+
+/* Booking Details */
+.booking-card p {
+    font-size: 15px;
+    color: #444;
+}
+
+/* Label Styling */
+.booking-card p strong {
+    color: #1e3a8a; /* Dark blue */
+}
+
+/* Back to Dashboard Button */
+/* .back-btn {
+    width: 100%;
+    padding: 12px;
+    background: #5d4b6d; 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    margin-top: 20px;
+}
+
+.back-btn:hover {
+    background: #29014c;
+}  */
+
+
+.create-event-wrapper {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+}
+
+.create-event-title {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #222;
+}
+
+.create-event-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.create-event-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #444;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.create-event-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.create-event-input:focus {
+    border-color: #6200ea;
+    box-shadow: 0 0 6px rgba(98, 0, 234, 0.3);
+    outline: none;
+}
+
+.create-event-btn {
+    background: #6200ea;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.create-event-btn:hover {
+    background: #4500b5;
+}
+
+.create-event-back {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6200ea;
+    border: 1px solid #6200ea;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.create-event-back:hover {
+    background: #6200ea;
+    color: white;
+}
