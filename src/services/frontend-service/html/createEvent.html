@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="create-event-wrapper">
+        <h2 class="create-event-title">Create a New Event</h2>
+        <form id="createEventForm">
+        
+            <div class="create-event-group">
+                <label for="eventName">Event Name:</label>
+                <input type="text" id="eventName" class="create-event-input" placeholder="Enter event name" required>
+            </div>
+            <div class="create-event-group">
+                <label for="eventLocation">Location:</label>
+                <input type="text" id="eventLocation" class="create-event-input" placeholder="Enter location" required>
+            </div>
+            <button type="submit" class="create-event-btn">Create Event</button>
+        </form>
+        <a href="dashboard.html" class="create-event-back">Back to Dashboard</a>
+    </div>
+
+    <script>
+        document.getElementById("createEventForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+        
+            
+            const eventName = document.getElementById("eventName").value;
+            const eventLocation = document.getElementById("eventLocation").value;
+        
+            const eventData = { name: eventName, location: eventLocation };
+            const token = localStorage.getItem("jwtToken"); 
+            try {
+                const response = await fetch("http://localhost:8080/events/", {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" },
+                    body: JSON.stringify(eventData),
+                });
+        
+                const result = await response.json();
+                if (response.ok) {
+                    alert("Event Created Successfully!");
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert("Error: " + result.error);
+                }
+            } catch (error) {
+                console.error("Error creating event:", error);
+                alert("Something went wrong. Try again!");
+            }
+        });
+        </script>
+        
+</body>
+</html>

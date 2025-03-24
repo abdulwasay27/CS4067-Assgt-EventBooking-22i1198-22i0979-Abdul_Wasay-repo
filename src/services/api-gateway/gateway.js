@@ -1,22 +1,26 @@
 const express = require("express");
 const axios = require("axios");
+const cors = require("cors");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
+app.use(cors()); 
 
-// Use the same secret key as your other services
+
 const SECRET_KEY = process.env.SECRET_KEY || "your_secret_key"; 
 
 // Define your microservices' base URLs
+
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || "http://localhost:3000";
 const BOOKING_SERVICE_URL = process.env.BOOKING_SERVICE_URL || "http://localhost:3001";
-const EVENT_SERVICE_URL = process.env.EVENT_SERVICE_URL || "http://localhost:3001";
+const EVENT_SERVICE_URL = process.env.EVENT_SERVICE_URL || "http://localhost:3002";
 
 app.post("/user/signup", async (req, res) => {
     // Forward request to user service for sign-up
     const targetUrl = `${USER_SERVICE_URL}/signup`;
+    console.log("hello")
     try {
         const response = await axios.post(targetUrl, req.body);
         res.status(response.status).send(response.data);
@@ -86,6 +90,7 @@ app.all("/user/*", async (req, res) => {
 // Forward requests to the booking service
 app.all("/booking/*", async (req, res) => {
   const targetUrl = `${BOOKING_SERVICE_URL}${req.originalUrl.replace("/booking", "/book")}`;
+  
   try {
     const response = await axios({
       method: req.method,
@@ -105,6 +110,7 @@ app.all("/booking/*", async (req, res) => {
 
 app.all("/events/*", async (req, res) => {
     const targetUrl = `${EVENT_SERVICE_URL}${req.originalUrl}`;
+    
     try {
         const response = await axios({
             method: req.method,
