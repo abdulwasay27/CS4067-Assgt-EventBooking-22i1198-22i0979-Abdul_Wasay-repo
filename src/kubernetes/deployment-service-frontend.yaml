@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-service
+  namespace: onlineeventbookingabdulwasay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-service
+  template:
+    metadata:
+      labels:
+        app: frontend-service
+    spec:
+      containers:
+        - name: frontend-service
+          image: 22i1198/frontend-service:latest
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: event-booking-config
+            - secretRef:
+                name: event-booking-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: onlineeventbookingabdulwasay
+spec:
+  selector:
+    app: frontend-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

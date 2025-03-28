@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
-    <link rel="stylesheet" href="../css/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
     <div class="main-wrapper">
-        <h2>Dashboard</h2>
-        <div class="link-container">
-            <a href="createEvent.html" class="nav-btn">Create Event</a>
-            <a href="events.html" class="nav-btn">View Events</a>
-            <a href="bookings.html" class="nav-btn">My Bookings</a>
-            <button class="nav-btn exit-btn" onclick="logoutUser()">Logout</button>
-        </div>
+      <h2>Dashboard</h2>
+      <div class="link-container">
+        <a href="createEvent.html" class="nav-btn">Create Event</a>
+        <a href="events.html" class="nav-btn">View Events</a>
+        <a href="bookings.html" class="nav-btn">My Bookings</a>
+        <button class="nav-btn exit-btn" onclick="logoutUser()">Logout</button>
+      </div>
     </div>
 
     <script>
-        function logoutUser() {
-            // Clear session storage
-            sessionStorage.clear();
-            // Clear local storage (if storing JWT/token there)
-            localStorage.clear();
-            // Redirect to login page
-            window.location.href = "login.html";
-        }
+      function logoutUser() {
+        // Clear session storage
+        sessionStorage.clear();
+        // Clear local storage (if storing JWT/token there)
+        localStorage.clear();
+        // Redirect to login page
+        window.location.href = "login.html";
+      }
     </script>
-</body>
+  </body>
 </html>

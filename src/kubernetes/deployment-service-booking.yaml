@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service
+  namespace: onlineeventbookingabdulwasay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+  template:
+    metadata:
+      labels:
+        app: booking-service
+    spec:
+      containers:
+        - name: booking-service
+          image: 22i1198/booking-service:latest
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: event-booking-config
+            - secretRef:
+                name: event-booking-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service
+  namespace: onlineeventbookingabdulwasay
+spec:
+  selector:
+    app: booking-service
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: ClusterIP
