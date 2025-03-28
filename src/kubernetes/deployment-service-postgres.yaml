@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+  namespace: onlineeventbookingabdulwasay
+data:
+  init.sql: |
+    create table if not exists users(
+    email varchar(50) primary key,
+    password varchar(500)
+    );
+    create table if not exists event(
+    event_id int primary key,
+    name varchar(50),
+    location varchar(500)
+    );
+    create table if not exists booking(
+    email varchar(50),
+    booking_id serial,
+    event_id int, 
+    num_tickets int, 
+    status varchar(50),
+    constraint event_id_fk foreign key (event_id) references event(event_id),
+    constraint email_fk foreign key(email) references users(email),
+    PRIMARY KEY (email, event_id)
+    );
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: onlineeventbookingabdulwasay
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: onlineeventbookingabdulwasay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          envFrom:
+            - configMapRef:
+                name: event-booking-config
+            - secretRef:
+                name: event-booking-secrets
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: DATABASE_NAME
+
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: DATABASE_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: event-booking-secrets
+                  key: DATABASE_PASSWORD
+
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: event-booking-config
+                  key: DATABASE_PORT
+
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        - name: init-sql
+          configMap:
+            name: postgres-init-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: onlineeventbookingabdulwasay
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
