@@ -3,9 +3,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pool = require("./postgres-database");
 
+require("dotenv").config();
+
 const app = express();
-const PORT = 3000;
-const SECRET_KEY = "your_secret_key";
+const PORT = process.env.USER_SERVICE_PORT || 3000;
+const SECRET_KEY = process.env.SECRET_KEY || "my_key";
 
 app.use(express.json());
 
@@ -98,6 +100,7 @@ app.post("/login", async (req, res) => {
     const token = jwt.sign({ email: user.email, userId: user.id }, SECRET_KEY, {
       expiresIn: "1h",
     });
+    console.log(`Generated token ${token} for user: ${user.email}`);
     res.json({ message: "Login successful!", token });
   } catch (error) {
     console.error(error);
@@ -107,5 +110,5 @@ app.post("/login", async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on ${process.env.USER_SERVICE_URL}:${PORT}`);
 });

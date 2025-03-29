@@ -8,20 +8,24 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const SECRET_KEY = process.env.SECRET_KEY || "your_secret_key";
+const SECRET_KEY = process.env.SECRET_KEY || "my_key";
 
 // Define your microservices' base URLs
 
-const USER_SERVICE_URL =
-  process.env.USER_SERVICE_URL || "http://user-service:3000";
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL || "http://user-service";
+const GATEWAY_SERVICE_URL =
+  process.env.GATEWAY_SERVICE_URL || "http://gateway-service";
+const USER_SERVICE_PORT = process.env.USER_SERVICE_PORT || "3000";
 const BOOKING_SERVICE_URL =
-  process.env.BOOKING_SERVICE_URL || "http://booking-service:3001";
+  process.env.BOOKING_SERVICE_URL || "http://booking-service";
+const BOOKING_SERVICE_PORT = process.env.BOOKING_SERVICE_PORT || "3001";
 const EVENT_SERVICE_URL =
-  process.env.EVENT_SERVICE_URL || "http://event-service:3002";
+  process.env.EVENT_SERVICE_URL || "http://event-service";
+const EVENT_SERVICE_PORT = process.env.EVENT_SERVICE_PORT || "3001";
 
 app.post("/user/signup", async (req, res) => {
   // Forward request to user service for sign-up
-  const targetUrl = `${USER_SERVICE_URL}/signup`;
+  const targetUrl = `${USER_SERVICE_URL}:${USER_SERVICE_PORT}/signup`;
   try {
     const response = await axios.post(targetUrl, req.body);
     res.status(response.status).send(response.data);
@@ -36,7 +40,7 @@ app.post("/user/signup", async (req, res) => {
 
 app.post("/user/login", async (req, res) => {
   // Forward request to user service for login
-  const targetUrl = `${USER_SERVICE_URL}/login`;
+  const targetUrl = `${USER_SERVICE_URL}:${USER_SERVICE_PORT}/login`;
   try {
     const response = await axios.post(targetUrl, req.body);
     res.status(response.status).send(response.data);
@@ -52,6 +56,7 @@ app.post("/user/login", async (req, res) => {
 // JWT verification middleware
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
+  console.log(`Received token ${authHeader} for verification`);
   if (!authHeader) {
     return res.status(401).json({ message: "No token provided" });
   }
@@ -69,7 +74,7 @@ app.use(verifyToken);
 
 // Forward requests to the user service
 app.all("/user/*", async (req, res) => {
-  const targetUrl = `${USER_SERVICE_URL}${req.originalUrl.replace(
+  const targetUrl = `${USER_SERVICE_URL}:${USER_SERVICE_PORT}${req.originalUrl.replace(
     "/user",
     ""
   )}`;
@@ -92,7 +97,7 @@ app.all("/user/*", async (req, res) => {
 
 // Forward requests to the booking service
 app.all("/booking/*", async (req, res) => {
-  const targetUrl = `${BOOKING_SERVICE_URL}${req.originalUrl.replace(
+  const targetUrl = `${BOOKING_SERVICE_URL}:${BOOKING_SERVICE_PORT}${req.originalUrl.replace(
     "/booking",
     "/book"
   )}`;
@@ -115,7 +120,7 @@ app.all("/booking/*", async (req, res) => {
 });
 
 app.all("/events/*", async (req, res) => {
-  const targetUrl = `${EVENT_SERVICE_URL}${req.originalUrl}`;
+  const targetUrl = `${EVENT_SERVICE_URL}:${EVENT_SERVICE_PORT}${req.originalUrl}`;
 
   try {
     const response = await axios({
@@ -135,7 +140,7 @@ app.all("/events/*", async (req, res) => {
 });
 
 // Start the API Gateway
-const GATEWAY_PORT = process.env.GATEWAY_PORT || 8080;
+const GATEWAY_PORT = process.env.GATEWAY_SERVICE_PORT || 8080;
 app.listen(GATEWAY_PORT, () => {
-  console.log(`API Gateway running on http://localhost:${GATEWAY_PORT}`);
+  console.log(`API Gateway running on ${GATEWAY_SERVICE_URL}:${GATEWAY_PORT}`);
 });

@@ -21,6 +21,20 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: gateway-service
+                name: frontend-service
                 port:
-                  number: 8080
+                  number: 80
+          - path: /booking
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+          - path: /events
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80

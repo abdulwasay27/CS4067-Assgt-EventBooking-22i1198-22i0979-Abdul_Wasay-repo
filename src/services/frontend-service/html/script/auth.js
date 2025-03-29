@@ -60,19 +60,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Proceed with form submission
       try {
-        const response = await fetch(
-          "http://gateway-service:8080/user/signup",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: email.value,
-              password: password.value,
-            }),
-          }
-        );
+        const response = await fetch("http://eventbooking.com:80/user/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email.value,
+            password: password.value,
+          }),
+        });
         const data = await response.json();
         if (response.ok) {
           alert(data.message || "User registered successfully!");
@@ -111,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Proceed with form submission
       try {
-        const response = await fetch("http://gateway-service:8080/user/login", {
+        const response = await fetch("http://eventbooking.com:80/user/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

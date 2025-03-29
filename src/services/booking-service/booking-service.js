@@ -5,17 +5,20 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 require("dotenv").config();
 
+const BOOKING_SERVICE_URL =
+  process.env.BOOKING_SERVICE_URL || "http://booking-service";
 const EVENT_SERVICE_URL =
   process.env.EVENT_SERVICE_URL || "http://localhost:3002";
+const EVENT_SERVICE_PORT = process.env.EVENT_SERVICE_PORT || "3002";
 const rabbitmq_host = process.env.RABBITMQ_HOST;
 const rabbitmq_port = process.env.RABBITMQ_PORT;
 const rabbitmq_user = process.env.RABBITMQ_USER;
 const rabbitmq_password = process.env.RABBITMQ_PASSWORD;
 const queue_name = process.env.RABBITMQ_QUEUE | "booking_notifications";
-const SECRET_KEY = process.env.SECRET_KEY || "your_secret_key";
+const SECRET_KEY = process.env.SECRET_KEY || "my_key";
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.BOOKING_SERVICE_PORT || 3001;
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -24,7 +27,9 @@ app.get("/", (req, res) => {
 
 async function checkEventValidity(eventId) {
   try {
-    const response = await axios.get(`${EVENT_SERVICE_URL}/events/${eventId}`);
+    const response = await axios.get(
+      `${EVENT_SERVICE_URL}:${EVENT_SERVICE_PORT}/events/${eventId}`
+    );
     return response.data && response.data;
   } catch (error) {
     console.error("Error checking event validity:", error.message);
@@ -170,5 +175,7 @@ app.get("/book/userEventBooking", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(
+    `Server is running on ${process.env.BOOKING_SERVICE_URL}:${PORT}`
+  );
 });
