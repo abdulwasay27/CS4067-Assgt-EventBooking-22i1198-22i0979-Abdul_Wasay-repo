@@ -1,2 +1,24 @@
 node_modules/ 
 .env
+# Terraform
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+crash.*.log
+*.tfstate
+*.tfstate.*
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+*.pem
+id_rsa
+id_rsa.pub
+kubernetes-key
+kubernetes-key.pub
