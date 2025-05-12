@@ -35,7 +35,6 @@ resource "aws_security_group" "kubernetes" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   # HTTP/HTTPS for Ingress
   ingress {
     from_port   = 80
