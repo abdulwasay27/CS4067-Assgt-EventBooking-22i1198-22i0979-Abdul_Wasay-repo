@@ -46,12 +46,12 @@ jobs:
       - name: Generate Ansible Inventory
         working-directory: infrastructure/ansible
         run: |
-          echo "all:
-  hosts:
-    kubernetes_master:
-      ansible_host: $EC2_IP
-      ansible_user: ubuntu
-      ansible_ssh_private_key_file: ../terraform/id_rsa" > inventory.yml
+          echo "all:" > inventory.yml
+          echo "  hosts:" >> inventory.yml
+          echo "    kubernetes_master:" >> inventory.yml
+          echo "      ansible_host: ${{ env.EC2_IP }}" >> inventory.yml
+          echo "      ansible_user: ubuntu" >> inventory.yml
+          echo "      ansible_ssh_private_key_file: ../terraform/id_rsa" >> inventory.yml
 
       - name: Set up Python & Ansible
         run: |
