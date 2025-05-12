@@ -84,7 +84,6 @@ resource "aws_instance" "kubernetes" {
   }
 }
 
-
 # Create key pair
 resource "aws_key_pair" "kubernetes" {
   key_name   = "kubernetes-key"
