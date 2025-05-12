@@ -18,6 +18,8 @@ jobs:
       - name: Generate SSH key pair
         run: |
           ssh-keygen -t rsa -b 2048 -f infrastructure/terraform/id_rsa -N ""
+      - name: Set correct permissions for private key
+        run: chmod 600 infrastructure/terraform/id_rsa
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
