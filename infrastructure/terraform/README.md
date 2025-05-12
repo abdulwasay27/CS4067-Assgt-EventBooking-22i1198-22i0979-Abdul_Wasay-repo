@@ -7,6 +7,10 @@ This directory contains Terraform configuration files to provision the infrastru
 1. AWS CLI installed and configured with appropriate credentials
 2. Terraform installed (version >= 1.0.0)
 3. SSH key pair for EC2 instance access
+4. **S3 bucket for Terraform state**
+   - S3 bucket: `eventbooking-terraform-state`
+
+> **Note:** You must create the S3 bucket before running Terraform. You can do this manually or with Terraform in a separate workspace.
 
 ## Configuration
 
@@ -24,7 +28,7 @@ This directory contains Terraform configuration files to provision the infrastru
 
 ## Usage
 
-1. Initialize Terraform:
+1. Initialize Terraform (with S3 backend):
    ```bash
    terraform init
    ```
@@ -71,4 +75,5 @@ terraform destroy
 - The configuration uses t2.micro instance type which is eligible for AWS free tier
 - The root volume size is set to 8GB which is within free tier limits
 - All necessary ports for the application are opened in the security group
+- **Terraform state is stored remotely in S3.**
 - Docker is automatically installed on the instance via user data script 

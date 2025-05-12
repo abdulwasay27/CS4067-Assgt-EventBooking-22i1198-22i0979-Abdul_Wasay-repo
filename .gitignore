@@ -22,3 +22,4 @@ id_rsa
 id_rsa.pub
 kubernetes-key
 kubernetes-key.pub
+inventory.yml

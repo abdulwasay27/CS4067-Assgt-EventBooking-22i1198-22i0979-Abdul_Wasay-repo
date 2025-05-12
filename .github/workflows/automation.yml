@@ -1,23 +1,66 @@
-name: Create Jira issue 
+name: Terraform & Ansible CI
+
 on:
-   issues:
-      types:
-      - opened  
+  push:
+    paths:
+      - 'infrastructure/terraform/**'
+      - 'infrastructure/ansible/**'
+      - '.github/workflows/infra-deploy.yml'
+
 jobs:
-   create_jira_issue:
-      runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Checkout repo
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Create issue
-          run: |
-               curl -X POST \
-               -H 'Content-type: application/json' \
-               -H 'X-Automation-Webhook-Token: d026a10efac65baca5831be534ef7d25a11bccce' \
-               --data '{ "issue":  "${{ github.event.issue.title }}", "description": "${{ github.event.issue.description }}" }' \
-               https://api-private.atlassian.com/automation/webhooks/jira/a/12ae687c-dbe5-40e1-8497-555ff304f115/0194ec48-b093-7a2f-baa5-448c537ad90e
+      - name: Generate SSH key pair
+        run: |
+          ssh-keygen -t rsa -b 2048 -f infrastructure/terraform/id_rsa -N ""
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
- 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: infrastructure/terraform
+        run: terraform apply -auto-approve -var 'ssh_public_key_path=id_rsa.pub'
+
+      - name: Get EC2 Public IP from Terraform Output
+        id: tf_output
+        working-directory: infrastructure/terraform
+        run: |
+          echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+
+      - name: Generate Ansible Inventory
+        working-directory: infrastructure/ansible
+        run: |
+          cat > inventory.yml <<EOF
+all:
+  hosts:
+    kubernetes_master:
+      ansible_host: $EC2_IP
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ../terraform/id_rsa
+EOF
+
+      - name: Set up Python & Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install ansible
+
+      - name: Run Ansible Playbook
+        working-directory: infrastructure/ansible
+        run: ansible-playbook -i inventory.yml kubernetes-setup.yml

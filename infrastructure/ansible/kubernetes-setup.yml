@@ -1,22 +1,8 @@
 ---
-- name: Setup Single-Node Kubernetes Cluster with kubeadm
+- name: Setup Single-Node Kubernetes Cluster with k3s
   hosts: kubernetes_master
   become: yes
-  vars:
-    kubernetes_version: "1.29"
-    pod_network_cidr: "10.244.0.0/16"
-
   tasks:
-    - name: Update apt cache and install prerequisites
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg
-        state: present
-        update_cache: yes
-
     - name: Disable swap
       command: swapoff -a
       changed_when: false
@@ -24,163 +10,80 @@
     - name: Remove swapfile from /etc/fstab
       lineinfile:
         path: /etc/fstab
-        regexp: "^.*swap.*$"
+        regexp: '^.*swap.*$'
         state: absent
 
-    - name: Load required kernel modules
-      modprobe:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - overlay
-        - br_netfilter
-
-    - name: Ensure kernel modules are loaded on boot
-      copy:
-        dest: /etc/modules-load.d/k8s.conf
-        content: |
-          overlay
-          br_netfilter
-
-    - name: Set sysctl params for Kubernetes networking
-      sysctl:
-        name: "{{ item.key }}"
-        value: "{{ item.value }}"
-        sysctl_file: /etc/sysctl.d/k8s.conf
-        state: present
-        reload: yes
-      loop:
-        - { key: "net.bridge.bridge-nf-call-iptables", value: "1" }
-        - { key: "net.bridge.bridge-nf-call-ip6tables", value: "1" }
-        - { key: "net.ipv4.ip_forward", value: "1" }
-
-    # Install Containerd
-    - name: Add Docker GPG key (for containerd)
-      get_url:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        dest: /etc/apt/trusted.gpg.d/docker.asc # Using .asc for binary gpg key
-        mode: "0644"
-        force: true # Overwrite if exists, useful for reruns
-
-    - name: Add Docker repository (for containerd)
-      apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-        state: present
-        filename: docker
-
-    - name: Install containerd
-      apt:
-        name: containerd.io
-        state: present
-        update_cache: yes
-
-    - name: Create containerd config directory and generate default config
+    - name: Install k3s (lightweight Kubernetes)
       shell: |
-        mkdir -p /etc/containerd
-        containerd config default > /etc/containerd/config.toml
+        curl -sfL https://get.k3s.io | sh -
       args:
-        creates: /etc/containerd/config.toml
+        creates: /usr/local/bin/k3s
 
-    - name: Enable SystemdCgroup in containerd
-      replace:
-        path: /etc/containerd/config.toml
-        regexp: "SystemdCgroup = false"
-        replace: "SystemdCgroup = true"
-      notify: Restart containerd
-
-    # Install Kubernetes components (kubeadm, kubelet, kubectl)
-    - name: Create apt keyrings directory for Kubernetes
-      file:
-        path: /etc/apt/keyrings
-        state: directory
-        mode: "0755"
-
-    - name: Download Kubernetes GPG key
-      get_url:
-        url: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/Release.key"
-        dest: "/tmp/kubernetes-apt-keyring.gpg.abs" # Temporary download location
-        mode: "0644"
-
-    - name: Convert Kubernetes GPG key to dearmor format
-      command: "gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-apt-keyring.gpg.abs"
-      args:
-        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
-    - name: Add Kubernetes apt repository
-      apt_repository:
-        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/ /"
-        state: present
-        filename: kubernetes
-
-    - name: Install kubelet, kubeadm, kubectl
-      apt:
-        name:
-          - kubelet
-          - kubeadm
-          - kubectl
-        state: present
-        update_cache: yes
-
-    - name: Hold Kubernetes component versions
-      dpkg_selections:
-        name: "{{ item }}"
-        selection: hold
-      loop:
-        - kubelet
-        - kubeadm
-        - kubectl
-
-    - name: Enable and start kubelet service
+    - name: Wait for k3s service to be active
       systemd:
-        name: kubelet
+        name: k3s
+        state: started
         enabled: yes
-        state: started # Kubeadm will restart it as needed
 
-    # Initialize Kubernetes cluster
-    - name: Initialize Kubernetes control plane
-      command: "kubeadm init --pod-network-cidr={{ pod_network_cidr }} --cri-socket unix:///run/containerd/containerd.sock"
-      args:
-        creates: /etc/kubernetes/admin.conf # Makes task idempotent
-
-    # Configure kubectl for the ansible_user (ubuntu)
-    - name: Create .kube directory for ansible_user
-      file:
-        path: "/home/{{ ansible_user }}/.kube"
-        state: directory
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}" # Ensure group is also set
-        mode: "0700" # More secure permissions
-
-    - name: Copy admin.conf to ansible_user's .kube directory
+    - name: Copy kubeconfig for ansible_user
       copy:
-        src: /etc/kubernetes/admin.conf
-        dest: "/home/{{ ansible_user }}/.kube/config"
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /home/{{ ansible_user }}/.kube/config
         remote_src: yes
         owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}" # Ensure group is also set
-        mode: "0600" # Secure permissions for config
+        group: "{{ ansible_user }}"
+        mode: "0600"
 
-    # Install Flannel CNI
-    - name: Apply Flannel CNI manifest
-      become: no # Run as the ansible_user (ubuntu)
-      command: "kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml"
+    - name: Update kubeconfig server address to use public IP
+      lineinfile:
+        path: /home/{{ ansible_user }}/.kube/config
+        regexp: '^\s*server: https://127.0.0.1:6443'
+        line: "    server: https://{{ ansible_host }}:6443"
+        backrefs: yes
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0600"
+
+    - name: Download Helm install script
+      get_url:
+        url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        dest: /tmp/get_helm.sh
+        mode: '0755'
+
+    - name: Install Helm
+      shell: /tmp/get_helm.sh
+      args:
+        creates: /usr/local/bin/helm
+
+    - name: Add Argo CD Helm repository
+      shell: helm repo add argo https://argoproj.github.io/argo-helm
       environment:
-        KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
-      changed_when: true # Assume it always changes or use a more complex check
+        KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+      become: false
+      become_user: "{{ ansible_user }}"
+      args:
+        creates: /home/{{ ansible_user }}/.cache/helm/repository/argo-index.yaml
 
-    # Untaint control-plane node for single-node cluster
-    - name: Untaint control-plane node to schedule pods
-      become: no # Run as the ansible_user (ubuntu)
-      command: "kubectl taint nodes --all node-role.kubernetes.io/control-plane-"
+    - name: Update Helm repositories
+      shell: helm repo update
       environment:
-        KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
-      register: taint_result
-      failed_when: 'taint_result.rc != 0 and ''NoTaints'' not in taint_result.stderr and ''already untainted'' not in taint_result.stderr and ''taint "node-role.kubernetes.io/control-plane" not found'' not in taint_result.stderr'
-      changed_when: "'untainted' in taint_result.stdout"
+        KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+      become: false
+      become_user: "{{ ansible_user }}"
 
-  handlers:
-    - name: Restart containerd
-      systemd:
-        name: containerd
-        state: restarted
-        daemon_reload: yes
+    - name: Create argocd namespace
+      shell: kubectl create namespace argocd --kubeconfig /home/{{ ansible_user }}/.kube/config || true
+
+    - name: Install Argo CD with Helm
+      shell: |
+        helm install argocd argo/argo-cd \
+          --namespace argocd \
+          --kubeconfig /home/{{ ansible_user }}/.kube/config
+      become: false
+      become_user: "{{ ansible_user }}"
+
+    - name: Patch Argo CD server service to NodePort
+      shell: |
+        kubectl patch svc argocd-server -n argocd \
+          -p '{"spec": {"type": "NodePort"}}' \
+          --kubeconfig /home/{{ ansible_user }}/.kube/config || true
