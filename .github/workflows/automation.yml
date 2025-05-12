@@ -52,6 +52,7 @@ jobs:
           echo "      ansible_host: ${{ env.EC2_IP }}" >> inventory.yml
           echo "      ansible_user: ubuntu" >> inventory.yml
           echo "      ansible_ssh_private_key_file: ../terraform/id_rsa" >> inventory.yml
+          echo "      ansible_ssh_common_args: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" >> inventory.yml
 
       - name: Set up Python & Ansible
         run: |
