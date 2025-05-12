@@ -15,10 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Generate SSH key pair
-        run: |
-          ssh-keygen -t rsa -b 2048 -f infrastructure/terraform/id_rsa -N ""
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -51,7 +47,7 @@ jobs:
           echo "    kubernetes_master:" >> inventory.yml
           echo "      ansible_host: ${{ env.EC2_IP }}" >> inventory.yml
           echo "      ansible_user: ubuntu" >> inventory.yml
-          echo "      ansible_ssh_private_key_file: ../terraform/id_rsa" >> inventory.yml
+          echo "      ansible_ssh_private_key_file: ~/.ssh/id_rsa" >> inventory.yml
           echo "      ansible_ssh_common_args: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" >> inventory.yml
 
       - name: Set up Python & Ansible
@@ -59,6 +55,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3-pip
           pip3 install ansible
+
+      - name: Set up SSH private key for Ansible
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       - name: Run Ansible Playbook
         working-directory: infrastructure/ansible
