@@ -142,5 +142,5 @@ app.all("/events/*", async (req, res) => {
 // Start the API Gateway
 const GATEWAY_PORT = process.env.GATEWAY_SERVICE_PORT || 8080;
 app.listen(GATEWAY_PORT, () => {
-  console.log(`API Gateway running on ${GATEWAY_SERVICE_URL}:${GATEWAY_PORT}`);
+  console.log(`API Gateway is running on ${GATEWAY_SERVICE_URL}:${GATEWAY_PORT}`);
 });
