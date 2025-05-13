@@ -39,6 +39,12 @@ jobs:
         run: |
           echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
 
+      - name: Set up SSH private key for Ansible
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
       - name: Generate Ansible Inventory
         working-directory: infrastructure/ansible
         run: |
@@ -56,11 +62,6 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install ansible
 
-      - name: Set up SSH private key for Ansible
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
 
       - name: Run Ansible Playbook
         working-directory: infrastructure/ansible
