@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.configMapName }}
+  namespace: {{ .Values.global.namespace }}
+data:
+  DATABASE_HOST: "database"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "eventMgmt"
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_QUEUE: "booking_notifications"
+  USER_SERVICE_URL: "http://user-service"
+  GATEWAY_SERVICE_URL: "http://gateway-service"
+  BOOKING_SERVICE_URL: "http://booking-service"
+  EVENT_SERVICE_URL: "http://event-service"
+  GATEWAY_SERVICE_PORT: "8080"
+  USER_SERVICE_PORT: "3000"
+  BOOKING_SERVICE_PORT: "3001"
+  EVENT_SERVICE_PORT: "3002" 

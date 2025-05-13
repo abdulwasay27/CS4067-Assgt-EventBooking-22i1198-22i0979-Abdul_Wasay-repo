@@ -1,0 +1,158 @@
+# Default values for event-booking-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  namespace: onlineeventbookingabdulwasay
+  configMapName: event-booking-config
+  secretName: event-booking-secrets
+
+secrets:
+  databaseUser: "postgres"
+  databasePassword: "postgres"
+  rabbitmqUser: "guest"
+  rabbitmqPassword: "guest"
+  secretKey: "verysecretkey"
+
+ingress:
+  enabled: true # Set to false to disable Ingress creation
+  className: "nginx"
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: eventbooking.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: frontend-service # This should match one of the service names in the services list
+              port: 80
+        - path: /user
+          pathType: Prefix
+          backend:
+            service:
+              name: frontend-service
+              port: 80
+        - path: /booking
+          pathType: Prefix
+          backend:
+            service:
+              name: frontend-service
+              port: 80
+        - path: /events
+          pathType: Prefix
+          backend:
+            service:
+              name: frontend-service
+              port: 80
+  # tls:
+  #   - secretName: chart-example-tls
+  #     hosts:
+  #       - chart-example.local
+
+services:
+  - name: event
+    replicaCount: 1
+    image:
+      repository: 22i1198/event-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 3002
+  - name: frontend
+    replicaCount: 1
+    image:
+      repository: 22i1198/k8-frontend-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 80
+  - name: booking
+    replicaCount: 1
+    image:
+      repository: 22i1198/booking-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 3001
+  - name: gateway
+    replicaCount: 1
+    image:
+      repository: 22i1198/gateway-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 8080
+  - name: user
+    replicaCount: 1
+    image:
+      repository: 22i1198/user-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 3000
+  - name: notification
+    replicaCount: 1
+    image:
+      repository: 22i1198/notification-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 3001 # Assuming containerPort based on service targetPort
+  # Placeholders for stateful services - these might need dedicated templates
+  # - name: postgres
+  #   replicaCount: 1
+  #   image:
+  #     repository: postgres
+  #     tag: "13" # Or your specific version
+  #     pullPolicy: IfNotPresent
+  #   port: 5432
+  # - name: rabbitmq
+  #   replicaCount: 1
+  #   image:
+  #     repository: rabbitmq
+  #     tag: "3-management" # Or your specific version
+  #     pullPolicy: IfNotPresent
+  #   port: 5672 # For client connections
+  #   # RabbitMQ also typically exposes 15672 for the management UI
+
+postgresql:
+  enabled: true
+  name: "postgres" # Name for the Deployment and app label
+  replicaCount: 1
+  image:
+    repository: "postgres"
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  env:
+    postgresDatabase: "eventMgmt" # POSTGRES_DB; user/password come from global secrets
+  service:
+    name: "database" # This is the service name your app connects to
+    type: ClusterIP
+    port: 5432
+  persistence:
+    enabled: true
+    pvcName: "postgres-pvc"
+    # storageClass: "-" # Use "-" for default, or specify your StorageClass
+    accessModes:
+      - ReadWriteOnce
+    size: "512Mi"
+  initdb:
+    configMapName: "postgres-init-script"
+
+rabbitmq:
+  enabled: true
+  name: "rabbitmq" # Name for the Deployment and app label
+  replicaCount: 1
+  image:
+    repository: "rabbitmq"
+    tag: "3.12-management-alpine"
+    pullPolicy: IfNotPresent
+  service:
+    name: "rabbitmq" # This is the service name your app connects to
+    type: ClusterIP
+    amqpPort: 5672
+    managementPort: 15672
+  persistence:
+    enabled: false # Set to true to enable persistence
+    pvcName: "rabbitmq-pvc"
+    # storageClass: "-" # Use "-" for default, or specify your StorageClass
+    accessModes:
+      - ReadWriteOnce
+    size: "1Gi"
