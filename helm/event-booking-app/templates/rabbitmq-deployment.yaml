@@ -1,0 +1,49 @@
+{{- if .Values.rabbitmq.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.rabbitmq.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.rabbitmq.name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.rabbitmq.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.rabbitmq.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.rabbitmq.name }}
+    spec:
+      containers:
+        - name: {{ .Values.rabbitmq.name }}
+          image: "{{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}"
+          imagePullPolicy: {{ .Values.rabbitmq.image.pullPolicy }}
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: {{ .Values.secrets.rabbitmqUser | quote }}
+            - name: RABBITMQ_DEFAULT_PASS
+              value: {{ .Values.secrets.rabbitmqPassword | quote }}
+          ports:
+            - name: amqp
+              containerPort: {{ .Values.rabbitmq.service.amqpPort }}
+              protocol: TCP
+            - name: management
+              containerPort: {{ .Values.rabbitmq.service.managementPort }}
+              protocol: TCP
+          {{- if .Values.rabbitmq.persistence.enabled }}
+          volumeMounts:
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
+          {{- end }}
+      {{- if .Values.rabbitmq.persistence.enabled }}
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.rabbitmq.persistence.pvcName }}
+      {{- end }}
+{{- end }} 

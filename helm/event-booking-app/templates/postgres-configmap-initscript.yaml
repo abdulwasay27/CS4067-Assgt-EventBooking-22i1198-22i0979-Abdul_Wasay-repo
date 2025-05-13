@@ -1,0 +1,33 @@
+{{- if .Values.postgresql.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.postgresql.initdb.configMapName }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: postgresql
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  init.sql: |
+    create table if not exists users(
+    email varchar(50) primary key,
+    password varchar(500)
+    );
+    create table if not exists event(
+    event_id int primary key,
+    name varchar(50),
+    location varchar(500)
+    );
+    create table if not exists booking(
+    email varchar(50),
+    booking_id serial,
+    event_id int, 
+    num_tickets int, 
+    status varchar(50),
+    constraint event_id_fk foreign key (event_id) references event(event_id),
+    constraint email_fk foreign key(email) references users(email),
+    PRIMARY KEY (email, event_id)
+    );
+{{- end }} 

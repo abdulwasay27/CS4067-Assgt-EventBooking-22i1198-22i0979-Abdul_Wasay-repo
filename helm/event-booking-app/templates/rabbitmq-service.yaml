@@ -1,0 +1,25 @@
+{{- if .Values.rabbitmq.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.rabbitmq.service.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.rabbitmq.name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.rabbitmq.service.type }}
+  ports:
+    - name: amqp
+      port: {{ .Values.rabbitmq.service.amqpPort }}
+      targetPort: {{ .Values.rabbitmq.service.amqpPort }}
+      protocol: TCP
+    - name: management
+      port: {{ .Values.rabbitmq.service.managementPort }}
+      targetPort: {{ .Values.rabbitmq.service.managementPort }}
+      protocol: TCP
+  selector:
+    app: {{ .Values.rabbitmq.name }}
+{{- end }} 

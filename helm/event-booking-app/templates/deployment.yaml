@@ -1,0 +1,33 @@
+{{- range .Values.services }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-{{ .name }}
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    app: service-{{ .name }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: service-{{ .name }}
+  template:
+    metadata:
+      labels:
+        app: service-{{ .name }}
+    spec:
+      containers:
+        - name: service-{{ .name }}
+          image: "{{ .image.repository }}:{{ .image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ $.Values.global.configMapName }}
+            - secretRef:
+                name: {{ $.Values.global.secretName }}
+---
+{{- end }}
